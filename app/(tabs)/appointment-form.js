@@ -18,14 +18,11 @@ const validationSchema = Yup.object().shape({
     .min(10, 'Telefon numarası en az 10 haneli olmalıdır'),
   note: Yup.string(),
   status: Yup.string()
-    .required('Durum seçimi zorunludur')
 });
 
 export default function AppointmentFormScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-
-
 
   const initialValues = {
     customerName: '',
@@ -33,8 +30,7 @@ export default function AppointmentFormScreen() {
     time: new Date(),
     phoneNumber: '',
     note: '',
-    state:'Beklemede'
-
+    status: 'Beklemede'
   };
 
   const handleSubmit = (values) => {
@@ -52,7 +48,7 @@ export default function AppointmentFormScreen() {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
+          {({ handleChange, handleBlur, handleSubmit: formikSubmit, values, errors, touched, setFieldValue }) => (
             <View>
               {/* Müşteri Adı */}
               <View className="mb-4">
@@ -161,12 +157,14 @@ export default function AppointmentFormScreen() {
                 />
               </View>
 
-      
-
               {/* Kaydet Butonu */}
               <TouchableOpacity
                 className="bg-light-blue p-4 rounded-lg mb-8"
-                onPress={handleSubmit}
+                onPress={() => {
+                  console.log('Button pressed');
+                  console.log('Form values:', values);
+                  formikSubmit();
+                }}
               >
                 <Text className="text-black text-base text-center font-oswald">Kaydet</Text>
               </TouchableOpacity>

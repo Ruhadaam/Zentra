@@ -1,22 +1,24 @@
 import { useState } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
+import { useRouter } from 'expo-router';
+import { FontAwesome } from '@expo/vector-icons';
 
 const appointmentsData = {
     '2025-05-20': [
-        { time: '10:00', title: 'Alperen Gökçek' },
-        { time: '14:00', title: 'Ertuğrul Gökçek' },
-        { time: '15:00', title: 'Ertuğrul Gökçek' },
-        { time: '16:00', title: 'Ertuğrul Gökçek' },
-        { time: '17:00', title: 'Ertuğrul Gökçek' }
+        { time: '10:00', title: 'Alperen Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' },
+        { time: '14:00', title: 'Ertuğrul Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' },
+        { time: '15:00', title: 'Ertuğrul Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' },
+        { time: '16:00', title: 'Ertuğrul Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' },
+        { time: '17:00', title: 'Ertuğrul Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' }
     ],
     '2025-05-21': [
-        { time: '09:30', title: 'Şükrü Gökçek' }
+        { time: '09:30', title: 'Şükrü Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' }
     ],
     '2025-05-22': [
-        { time: '16:00', title: 'Hülya Gökçek' }
+        { time: '16:00', title: 'Hülya Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' }
     ]
 };
 
@@ -33,8 +35,21 @@ LocaleConfig.defaultLocale = 'tr';
 
 export default function AppointmentsScreen() {
     const [selectedDate, setSelectedDate] = useState('');
+    const router = useRouter();
 
     const selectedAppointments = appointmentsData[selectedDate] || [];
+
+    const handleAppointmentPress = (appointment) => {
+        router.push({
+            pathname: "/(stack)/details",
+            params: { 
+                appointment: JSON.stringify({
+                    ...appointment,
+                    date: selectedDate
+                })
+            }
+        });
+    };
 
     return (
         <SafeAreaView className="bg-dark flex-1">
@@ -81,16 +96,35 @@ export default function AppointmentsScreen() {
                     {selectedDate ? (
                         selectedAppointments.length > 0 ? (
                             selectedAppointments.map((appointment, index) => (
-                                <Animated.View
+                                <TouchableOpacity
                                     key={`${selectedDate}-${index}`}
-                                    entering={FadeInDown.delay(index * 100)} 
-                                    exiting={FadeOutUp}
-                                    className="bg-light-blue rounded-xl p-4 mb-3"
+                                    onPress={() => handleAppointmentPress(appointment)}
                                 >
-                                    <Text className="text-dark text-lg font-oswald">
-                                        {appointment.time} - {appointment.title}
-                                    </Text>
-                                </Animated.View>
+                                    <Animated.View
+                                        entering={FadeInDown.delay(index * 100)} 
+                                        exiting={FadeOutUp}
+                                        className="bg-light-blue rounded-xl p-4 mb-3"
+                                    >
+                                        <View className="flex-row justify-between items-start">
+                                            <View>
+                                                <View className="flex-row items-center">
+                                                    <FontAwesome name="clock-o" size={20} color="#0B1215" />
+                                                    <Text className="text-dark font-oswald ml-2">{appointment.time}</Text>
+                                                </View>
+                                                {appointment.note && (
+                                                    <View className="flex-row items-center mt-1 ml-7">
+                                                        <FontAwesome name="sticky-note-o" size={14} color="#0B1215" />
+                                                        <Text className="text-dark font-oswald text-sm ml-1">Not var</Text>
+                                                    </View>
+                                                )}
+                                            </View>
+                                            <View className="items-end">
+                                                <Text className="text-dark font-oswald">{appointment.title}</Text>
+                                                <Text className="text-dark font-oswald text-sm">{appointment.phoneNumber}</Text>
+                                            </View>
+                                        </View>
+                                    </Animated.View>
+                                </TouchableOpacity>
                             ))
                         ) : (
                             <Text className="text-gray-400 font-oswald text-center mt-3">
