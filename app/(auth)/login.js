@@ -6,6 +6,8 @@ import { useRouter } from 'expo-router';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from "../context/AuthContext";
+
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Geçersiz e-posta adresi').required('E-posta zorunludur'),
@@ -16,6 +18,7 @@ export default function Login() {
   const [error, setError] = useState(null);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   useEffect(() => {
     // AsyncStorage'den rememberMe tercihini oku
@@ -38,10 +41,10 @@ export default function Login() {
       // "Beni Hatırla" tercihini AsyncStorage'a kaydet
       await AsyncStorage.setItem('@rememberMe', JSON.stringify(rememberMe));
 
-      const user = await loginUser(values.email, values.password);
+      await login(values.email, values.password);
 
      
-     router.replace('/(tabs)'); 
+     // router.replace('/(tabs)'); // Navigation is now handled by AuthContext in _layout.js
     } catch (e) {
       setError(e.message);
       Alert.alert('Giriş Hatası', e.message);

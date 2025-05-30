@@ -5,6 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { Ionicons } from '@expo/vector-icons';
 
 const validationSchema = Yup.object().shape({
   customerName: Yup.string()
@@ -54,7 +55,7 @@ export default function AppointmentFormScreen() {
               <View className="mb-4">
                 <Text className="text-white font-oswald mb-2">Müşteri Adı *</Text>
                 <TextInput
-                  className="bg-light-blue text-black p-3 rounded-lg font-ancizar text-base"
+                  className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base"
                   value={values.customerName}
                   onChangeText={handleChange('customerName')}
                   onBlur={handleBlur('customerName')}
@@ -70,12 +71,13 @@ export default function AppointmentFormScreen() {
               <View className="mb-4">
                 <Text className="text-white font-oswald mb-2">Tarih *</Text>
                 <TouchableOpacity
-                  className="bg-light-blue p-3 rounded-lg"
+                  className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base flex-row items-center justify-between"
                   onPress={() => setShowDatePicker(true)}
                 >
-                  <Text className="text-black font-ancizar text-base">
+                  <Text className="text-white font-ancizar text-base">
                     {values.date.toLocaleDateString('tr-TR')}
                   </Text>
+                  <Ionicons name="calendar" size={24} color="#6C757D" />
                 </TouchableOpacity>
                 {showDatePicker && (
                   <DateTimePicker
@@ -99,12 +101,13 @@ export default function AppointmentFormScreen() {
               <View className="mb-4">
                 <Text className="text-white font-oswald mb-2">Saat *</Text>
                 <TouchableOpacity
-                  className="bg-light-blue p-3 rounded-lg"
+                  className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base flex-row items-center justify-between"
                   onPress={() => setShowTimePicker(true)}
                 >
-                  <Text className="text-black text-base font-ancizar">
+                  <Text className="text-white text-base font-ancizar">
                     {values.time.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                   </Text>
+                  <Ionicons name="time-outline" size={24} color="#6C757D" />
                 </TouchableOpacity>
                 {showTimePicker && (
                   <DateTimePicker
@@ -128,7 +131,7 @@ export default function AppointmentFormScreen() {
               <View className="mb-4">
                 <Text className="text-white font-oswald mb-2">Telefon Numarası</Text>
                 <TextInput
-                  className="bg-light-blue text-black p-3 rounded-lg font-ancizar text-base"
+                  className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base"
                   value={values.phoneNumber}
                   onChangeText={handleChange('phoneNumber')}
                   onBlur={handleBlur('phoneNumber')}
@@ -145,7 +148,7 @@ export default function AppointmentFormScreen() {
               <View className="mb-4">
                 <Text className="text-white font-oswald mb-2">Açıklama / Not</Text>
                 <TextInput
-                  className="bg-light-blue text-black p-3 rounded-lg font-ancizar text-base"
+                  className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base"
                   value={values.note}
                   onChangeText={handleChange('note')}
                   onBlur={handleBlur('note')}

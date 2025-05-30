@@ -6,8 +6,9 @@ import { StatusBar } from 'expo-status-bar';
 import '../global.css'; // NativeWind styles
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
-export default function RootLayout() {
+function RootLayoutNav() {
   const [fontsLoaded] = useFonts({
     'Oswald-Light': require('../assets/fonts/Oswald-Light.ttf'),
     'Oswald-ExtraLight': require('../assets/fonts/Oswald-ExtraLight.ttf'),
@@ -18,6 +19,7 @@ export default function RootLayout() {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const router = useRouter();
   const segments = useSegments();
+  const { user: authUser, loading } = useAuth();
 
   useEffect(() => {
     if (auth) {
@@ -33,26 +35,24 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
+    if (loading) return;
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (authUser && inAuthGroup) {
+      router.replace('/(tabs)');
+    } else if (!authUser && !inAuthGroup) {
+      router.replace('/(auth)/login');
+    }
+  }, [authUser, loading, segments]);
+
+  useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 
-  useEffect(() => {
-    if (isAuthenticating) return;
-
-    const inAuthGroup = segments[0] === '(auth)';
-
-    if (user && inAuthGroup) {
-      router.replace('/(tabs)');
-    } else if (!user && !inAuthGroup) {
-      router.replace('/(auth)/login');
-    }
-  }, [user, isAuthenticating, segments]);
-
-  if (!fontsLoaded || isAuthenticating) {
-    return null;
-  } else if (!user && segments[0] !== '(auth)') {
+  if (!fontsLoaded || loading) {
     return null;
   }
 
@@ -65,5 +65,13 @@ export default function RootLayout() {
         <Stack.Screen name="(stack)" options={{ headerShown: false }} />
       </Stack>
     </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
   );
 } 
