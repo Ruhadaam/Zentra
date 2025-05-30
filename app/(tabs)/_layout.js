@@ -37,11 +37,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="profile"
         options={{
-          title: 'Ayarlar',
+          title: 'Profil',
           headerShown: false,
-          tabBarIcon: ({ color }) => <FontAwesome name="cog" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome name="user" size={24} color={color} />,
         }}
       />
     </Tabs>

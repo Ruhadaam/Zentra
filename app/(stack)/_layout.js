@@ -11,6 +11,12 @@ export default function StackLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="register"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

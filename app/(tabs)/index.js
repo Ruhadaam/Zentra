@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, Modal, Pressable } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, /*Modal,*/ Pressable } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, withSpring } from 'react-native-reanimated';
@@ -118,7 +118,7 @@ export default function AnaSayfaScreen() {
         </View>
       </ScrollView>
 
-      <Modal
+      {/* <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -176,7 +176,7 @@ export default function AnaSayfaScreen() {
             </View>
           </View>
         </Pressable>
-      </Modal>
+      </Modal> */}
     </SafeAreaView>
   );
 } 
