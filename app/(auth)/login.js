@@ -7,6 +7,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from "../context/AuthContext";
+import { BlurView } from 'expo-blur';
 
 
 const LoginSchema = Yup.object().shape({
@@ -43,8 +44,6 @@ export default function Login() {
 
       await login(values.email, values.password);
 
-     
-     // router.replace('/(tabs)'); // Navigation is now handled by AuthContext in _layout.js
     } catch (e) {
       setError(e.message);
       Alert.alert('Giriş Hatası', e.message);
@@ -52,8 +51,12 @@ export default function Login() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-dark p-5 justify-center">
-      <Text className="text-white text-3xl font-oswald mb-8 text-center">Giriş Yap</Text>
+    <SafeAreaView className="flex-1 p-4 bg-dark justify-center">
+      <BlurView
+        intensity={20}
+        className="p-5 rounded-lg overflow-hidden"
+      >
+        <Text className="text-white text-3xl font-oswald mb-8 text-center">Giriş Yap</Text>
 
       <Formik
         initialValues={{ email: '', password: '' }}
@@ -119,6 +122,7 @@ export default function Login() {
       >
         <Text className="text-light-blue text-base text-center font-oswald">Hesabın yok mu? Kayıt Ol</Text>
       </TouchableOpacity>
+      </BlurView>
     </SafeAreaView>
   );
 }

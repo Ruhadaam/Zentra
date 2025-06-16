@@ -1,26 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
-
-const appointmentsData = {
-    '2025-05-20': [
-        { time: '10:00', title: 'Alperen Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' },
-        { time: '14:00', title: 'Ertuğrul Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' },
-        { time: '15:00', title: 'Ertuğrul Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' },
-        { time: '16:00', title: 'Ertuğrul Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' },
-        { time: '17:00', title: 'Ertuğrul Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' }
-    ],
-    '2025-05-21': [
-        { time: '09:30', title: 'Şükrü Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' }
-    ],
-    '2025-05-22': [
-        { time: '16:00', title: 'Hülya Gökçek', phoneNumber: '5533432506', note: 'asdasdasdf', status: 'Beklemede' }
-    ]
-};
+import { fetchAppointments } from '../../firebase/appointmentService';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 LocaleConfig.locales['tr'] = {
     monthNames: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
@@ -32,10 +19,60 @@ LocaleConfig.locales['tr'] = {
 
 LocaleConfig.defaultLocale = 'tr';
 
-
 export default function AppointmentsScreen() {
     const [selectedDate, setSelectedDate] = useState('');
+    const [appointmentsData, setAppointmentsData] = useState({});
     const router = useRouter();
+
+    useFocusEffect(
+        useCallback(() => {
+            const loadAppointments = async () => {
+                try {
+                    const data = await fetchAppointments();
+                    const groupedByDate = {};
+                    if (data) {
+                        Object.keys(data).forEach(key => {
+                            const appointment = data[key];
+                            let dateString = appointment.date;
+                            let timeString = appointment.time;
+
+                            if (!dateString && appointment.createdAt) {
+                                try {
+                                    const createdAtDate = new Date(appointment.createdAt);
+                                    dateString = createdAtDate.toISOString().split('T')[0];
+                                    timeString = createdAtDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                                } catch (error) {
+                                    console.error('Error parsing createdAt for appointment', key, ':', error);
+                                    return;
+                                }
+                            }
+
+                            if (dateString && timeString) {
+                                if (!groupedByDate[dateString]) {
+                                    groupedByDate[dateString] = [];
+                                }
+                                if (!appointment.id) {
+                                    appointment.id = key;
+                                }
+                                if (!appointment.time && timeString) {
+                                    appointment.time = timeString;
+                                }
+                                groupedByDate[dateString].push(appointment);
+                            } else {
+                                console.warn(`Appointment ${key} is missing date/time or createdAt and will be skipped.`);
+                            }
+                        });
+                    }
+                    setAppointmentsData(groupedByDate);
+                } catch (error) {
+                    console.error('Failed to load appointments:', error);
+                    // Optionally show an error message to the user
+                }
+            };
+
+            loadAppointments();
+        }, [])
+    );
 
     const selectedAppointments = appointmentsData[selectedDate] || [];
 
@@ -53,7 +90,7 @@ export default function AppointmentsScreen() {
 
     return (
         <SafeAreaView className="bg-dark flex-1">
-            <View className="flex-1">
+            <ScrollView className="flex-1">
                 <Text className="text-white text-3xl font-oswald p-5">Randevular</Text>
                 <Calendar
                     onDayPress={(day) => setSelectedDate(day.dateString)}
@@ -79,25 +116,30 @@ export default function AppointmentsScreen() {
                         textDayHeaderFontSize: 16
                     }}
                     markedDates={{
-                        '2025-05-20': { marked: true, dotColor: '#A8DADC' },
-                        '2025-05-21': { marked: true, dotColor: '#A8DADC' },
-                        '2025-05-22': { marked: true, dotColor: '#A8DADC' },
+                        // Mark dates that have appointments
+                        ...Object.keys(appointmentsData).reduce((acc, date) => {
+                            acc[date] = { marked: true, dotColor: '#A8DADC' };
+                            return acc;
+                        }, {}),
+                        // Mark the selected date
                         ...(selectedDate ? {
                             [selectedDate]: {
                                 selected: true,
                                 selectedColor: '#A8DADC',
-                                selectedTextColor: '#0B1215'
+                                selectedTextColor: '#0B1215',
+                                // Preserve marked status if it exists
+                                ...(appointmentsData[selectedDate] ? { marked: true, dotColor: '#A8DADC' } : {})
                             }
                         } : {})
                     }}
                 />
-
-                <ScrollView className="px-5 mt-5">
+                <Text className="text-gray-500 font-oswald text-center text-base mt-5">Randevu hakkında detay için randevuya tıklayınız</Text>
+                <View className="px-5 mt-5">
                     {selectedDate ? (
                         selectedAppointments.length > 0 ? (
-                            selectedAppointments.map((appointment, index) => (
+                            selectedAppointments.sort((a, b) => a.time.localeCompare(b.time)).map((appointment, index) => (
                                 <TouchableOpacity
-                                    key={`${selectedDate}-${index}`}
+                                    key={`${selectedDate}-${index}-${appointment.id || index}`}
                                     onPress={() => handleAppointmentPress(appointment)}
                                 >
                                     <Animated.View
@@ -109,18 +151,18 @@ export default function AppointmentsScreen() {
                                             <View>
                                                 <View className="flex-row items-center">
                                                     <FontAwesome name="clock-o" size={20} color="#0B1215" />
-                                                    <Text className="text-dark font-oswald ml-2">{appointment.time}</Text>
+                                                    <Text className="text-dark font-oswald text-base ml-2">{appointment.time || '--:--'}</Text>
                                                 </View>
                                                 {appointment.note && (
-                                                    <View className="flex-row items-center mt-1 ml-7">
-                                                        <FontAwesome name="sticky-note-o" size={14} color="#0B1215" />
-                                                        <Text className="text-dark font-oswald text-sm ml-1">Not var</Text>
+                                                    <View className="flex-row items-center mt-3 ml-2">
+                                                        <FontAwesome name="sticky-note-o" size={16} color="#0B1215" />
+                                                        <Text className="text-dark font-oswald text-base ml-1">Not var</Text>
                                                     </View>
                                                 )}
                                             </View>
                                             <View className="items-end">
-                                                <Text className="text-dark font-oswald">{appointment.title}</Text>
-                                                <Text className="text-dark font-oswald text-sm">{appointment.phoneNumber}</Text>
+                                                <Text className="text-dark font-oswald text-lg">{appointment.customerName || 'Bilinmiyor'}</Text>
+                                                <Text className="text-dark font-oswald text-base">{appointment.phoneNumber}</Text>
                                             </View>
                                         </View>
                                     </Animated.View>
@@ -136,8 +178,8 @@ export default function AppointmentsScreen() {
                             Bir tarih seçin.
                         </Text>
                     )}
-                </ScrollView>
-            </View>
+                </View>
+            </ScrollView>
         </SafeAreaView>
     );
 }

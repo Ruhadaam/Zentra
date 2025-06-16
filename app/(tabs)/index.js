@@ -3,10 +3,19 @@ import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
+import { fetchAppointments } from '../../firebase/appointmentService';
 
 export default function AnaSayfaScreen() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [appointmentsData, setAppointmentsData] = useState({});
+  const [todayAppointments, setTodayAppointments] = useState([]);
+  const [todayCount, setTodayCount] = useState(0);
+  const [weekCount, setWeekCount] = useState(0);
+  const [monthCount, setMonthCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
 
   const handleAppointmentPress = (appointment) => {
     setSelectedAppointment(appointment);
@@ -23,18 +32,72 @@ export default function AnaSayfaScreen() {
     setModalVisible(false);
   };
 
-  // Örnek randevu verileri
-  const todayAppointments = [
-    { id: 1, time: '09:00', patient: 'Ahmet Yılmaz', phone: '0532 123 4567' },
-    { id: 2, time: '10:30', patient: 'Ayşe Demir', phone: '0533 234 5678', note: 'İlk muayene' },
-    { id: 3, time: '14:00', patient: 'Mehmet Kaya', phone: '0535 345 6789', note: 'Kanal tedavisi' },
-    { id: 4, time: '15:30', patient: 'Zeynep Şahin', phone: '0536 456 7890', note: 'Diş beyazlatma' },
-    { id: 5, time: '16:45', patient: 'Ali Öztürk', phone: '0537 567 8901', note: 'Diş eti tedavisi' },
-    { id: 6, time: '16:45', patient: 'Ali Öztürk', phone: '0537 567 8901', note: 'Kontrol' },
-    { id: 7, time: '16:45', patient: 'Ali Öztürk', phone: '0537 567 8901', note: 'Diş çekimi' },
-    { id: 8, time: '16:45', patient: 'Ali Öztürk', phone: '0537 567 8901', note: 'İmplant kontrol' },
-    { id: 9, time: '16:45', patient: 'Ali Öztürk', phone: '0537 567 8901', note: 'Diş dolgusu' },
-  ];
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadAppointments = async () => {
+        try {
+          const data = await fetchAppointments();
+          setAppointmentsData(data || {});
+
+          if (data) {
+            const allAppointments = Object.values(data);
+            setTotalCount(allAppointments.length);
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday start of week
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            const appointmentsToday = allAppointments.filter(app => {
+              if (!app.date) return false;
+              const appDate = new Date(app.date);
+              appDate.setHours(0, 0, 0, 0);
+              return appDate.getTime() === today.getTime();
+            }).sort((a, b) => {
+              if (!a.time || !b.time) return 0; // Handle cases with missing time
+              const [aHour, aMinute] = a.time.split(':').map(Number);
+              const [bHour, bMinute] = b.time.split(':').map(Number);
+              if (aHour !== bHour) return aHour - bHour;
+              return aMinute - bMinute;
+            });
+            setTodayAppointments(appointmentsToday);
+            setTodayCount(appointmentsToday.length);
+
+            const appointmentsThisWeek = allAppointments.filter(app => {
+              if (!app.date) return false;
+              const appDate = new Date(app.date);
+              appDate.setHours(0, 0, 0, 0);
+              return appDate >= startOfWeek && appDate <= today; // Include today
+            });
+            setWeekCount(appointmentsThisWeek.length);
+
+            const appointmentsThisMonth = allAppointments.filter(app => {
+              if (!app.date) return false;
+              const appDate = new Date(app.date);
+              appDate.setHours(0, 0, 0, 0);
+              return appDate >= startOfMonth && appDate <= today; // Include today
+            });
+            setMonthCount(appointmentsThisMonth.length);
+
+          } else {
+            setTotalCount(0);
+            setTodayCount(0);
+            setWeekCount(0);
+            setMonthCount(0);
+            setTodayAppointments([]);
+          }
+
+        } catch (error) {
+          console.error('Failed to load appointments:', error);
+          // Optionally show an error message to the user
+        }
+      };
+
+      loadAppointments();
+    }, [])
+  );
 
   return (
     <SafeAreaView className="bg-dark flex-1">
@@ -55,28 +118,28 @@ export default function AnaSayfaScreen() {
               className="bg-dark-gray w-[48%] p-4 rounded-lg mb-4"
             >
               <Text className="text-white font-oswald text-lg">Bugünkü Randevular</Text>
-              <Text className="text-light-blue text-2xl font-oswald mt-2">5</Text>
+              <Text className="text-light-blue text-2xl font-oswald mt-2">{todayCount}</Text>
             </Animated.View>
             <Animated.View 
               entering={FadeInDown.delay(400).springify()}
               className="bg-dark-gray w-[48%] p-4 rounded-lg mb-4"
             >
               <Text className="text-white font-oswald text-lg">Bu Hafta</Text>
-              <Text className="text-light-blue text-2xl font-oswald mt-2">12</Text>
+              <Text className="text-light-blue text-2xl font-oswald mt-2">{weekCount}</Text>
             </Animated.View>
             <Animated.View 
               entering={FadeInDown.delay(600).springify()}
               className="bg-dark-gray w-[48%] p-4 rounded-lg"
             >
               <Text className="text-white font-oswald text-lg">Bu Ay</Text>
-              <Text className="text-light-blue text-2xl font-oswald mt-2">45</Text>
+              <Text className="text-light-blue text-2xl font-oswald mt-2">{monthCount}</Text>
             </Animated.View>
             <Animated.View 
               entering={FadeInDown.delay(800).springify()}
               className="bg-dark-gray w-[48%] p-4 rounded-lg"
             >
               <Text className="text-white font-oswald text-lg">Toplam</Text>
-              <Text className="text-light-blue text-2xl font-oswald mt-2">156</Text>
+              <Text className="text-light-blue text-2xl font-oswald mt-2">{totalCount}</Text>
             </Animated.View>
           </View>
 
@@ -86,9 +149,9 @@ export default function AnaSayfaScreen() {
             className="bg-dark-gray p-4 rounded-lg"
           >
             <Text className="text-white font-oswald text-xl mb-4">Bugünün Randevuları</Text>
-            {todayAppointments.map((appointment, index) => (
+            {todayAppointments.length > 0 ? (todayAppointments.map((appointment, index) => (
               <Animated.View
-                key={appointment.id}
+                key={`${appointment.id || index}`}
                 entering={FadeInUp.delay(1200 + (index * 200)).springify()}
                 className="bg-light-blue p-3 rounded-lg mb-3"
               >
@@ -97,23 +160,34 @@ export default function AnaSayfaScreen() {
                     <View>
                       <View className="flex-row items-center">
                         <FontAwesome name="clock-o" size={20} color="#0B1215" />
-                        <Text className="text-dark font-oswald ml-2">{appointment.time}</Text>
+                        <Text className="text-dark font-oswald ml-2">{appointment.time || '--:--'}</Text>
                       </View>
                       {appointment.note && (
-                        <View className="flex-row items-center mt-1 ml-7">
+                        <View className="flex-row items-center mt-1 ">
                           <FontAwesome name="sticky-note-o" size={14} color="#0B1215" />
                           <Text className="text-dark font-oswald text-sm ml-1">Not var</Text>
                         </View>
                       )}
                     </View>
+                    <View className="items-center justify-center">
+                      <Text className="text-dark font-oswald text-sm">Durum</Text>
+                      <Text className={`text-dark font-oswald text-lg ${appointment.status === 'Beklemede' ? 'text-yellow-600' : appointment.status === 'Tamamlandı' ? 'text-green-600' : 'text-red-600'}`}>
+                        {appointment.status || '--'}
+                        
+                      </Text>
+                    </View>
                     <View className="items-end">
-                      <Text className="text-dark font-oswald">{appointment.patient}</Text>
-                      <Text className="text-dark font-oswald text-sm">{appointment.phone}</Text>
+                      <Text className="text-dark font-oswald">{appointment.customerName || 'Bilinmiyor'}</Text>
+                      <Text className="text-dark font-oswald text-sm mt-2">{appointment.phoneNumber || '--'}</Text>
                     </View>
                   </View>
                 </TouchableOpacity>
               </Animated.View>
-            ))}
+            ))): (
+              <Text className="text-gray-400 font-oswald text-center mt-3">
+                Bugün için randevu bulunamadı.
+              </Text>
+            )}
           </Animated.View>
         </View>
       </ScrollView>

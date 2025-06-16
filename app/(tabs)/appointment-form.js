@@ -6,6 +6,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { Ionicons } from '@expo/vector-icons';
+import { saveAppointment } from '../../firebase/appointmentService';
 
 const validationSchema = Yup.object().shape({
   customerName: Yup.string()
@@ -34,9 +35,15 @@ export default function AppointmentFormScreen() {
     status: 'Beklemede'
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     console.log('Form Data:', values);
-    Alert.alert('Başarılı', 'Randevu başarıyla kaydedildi.');
+    try {
+      await saveAppointment(values);
+      Alert.alert('Başarılı', 'Randevu başarıyla kaydedildi.');
+    } catch (error) {
+      console.error('Error saving appointment:', error);
+      Alert.alert('Hata', 'Randevu kaydedilirken bir hata oluştu.');
+    }
   };
 
   return (
