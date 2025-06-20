@@ -135,14 +135,14 @@ export default function DetailsScreen() {
              {isEditing ? (
               <View className="flex-row ml-2 flex-1">
                 <TouchableOpacity
-                  className={`p-2 rounded-md mr-2 ${editedAppointment.status === 'beklemede' ? 'bg-dark' : 'bg-dark/50'}`}
-                  onPress={() => setEditedAppointment({ ...editedAppointment, status: 'beklemede' })}
+                  className={`p-2 rounded-md mr-2 ${editedAppointment.status?.toLowerCase() === 'beklemede' ? 'bg-dark' : 'bg-dark/50'}`}
+                  onPress={() => setEditedAppointment({ ...editedAppointment, status: 'Beklemede' })}
                 >
                   <Text className="text-white text-sm font-oswald">Beklemede</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  className={`p-2 rounded-md ${editedAppointment.status === 'tamamlandı' ? 'bg-dark' : 'bg-dark/50'}`}
-                  onPress={() => setEditedAppointment({ ...editedAppointment, status: 'tamamlandı' })}
+                  className={`p-2 rounded-md ${editedAppointment.status?.toLowerCase() === 'tamamlandı' ? 'bg-dark' : 'bg-dark/50'}`}
+                  onPress={() => setEditedAppointment({ ...editedAppointment, status: 'Tamamlandı' })}
                 >
                   <Text className="text-white text-sm font-oswald">Tamamlandı</Text>
                 </TouchableOpacity>

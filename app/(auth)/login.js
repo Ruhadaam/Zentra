@@ -52,10 +52,7 @@ export default function Login() {
 
   return (
     <SafeAreaView className="flex-1 p-4 bg-dark justify-center">
-      <BlurView
-        intensity={20}
-        className="p-5 rounded-lg overflow-hidden"
-      >
+  
         <Text className="text-white text-3xl font-oswald mb-8 text-center">Giriş Yap</Text>
 
       <Formik
@@ -117,12 +114,12 @@ export default function Login() {
       <TouchableOpacity
         className="w-full p-2"
         onPress={() => {
-          router.push('/(stack)/register');
+          router.push('/(auth)/register');
         }}
       >
         <Text className="text-light-blue text-base text-center font-oswald">Hesabın yok mu? Kayıt Ol</Text>
       </TouchableOpacity>
-      </BlurView>
+    
     </SafeAreaView>
   );
 }

@@ -5,7 +5,8 @@ import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, withSpring } 
 import { useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
-import { fetchAppointments } from '../../firebase/appointmentService';
+import { fetchAppointmentsWithIds, updateAppointment } from '../../firebase/appointmentService';
+import Toast from 'react-native-toast-message';
 
 export default function AnaSayfaScreen() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -17,32 +18,41 @@ export default function AnaSayfaScreen() {
   const [monthCount, setMonthCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
 
-  const handleAppointmentPress = (appointment) => {
-    setSelectedAppointment(appointment);
-    setModalVisible(true);
+  const handleAppointmentPress = async (appointment) => {
+    // Status toggle logic
+    const newStatus = appointment.status === 'Tamamlandı' ? 'Beklemede' : 'Tamamlandı';
+    const updatedAppointment = { ...appointment, status: newStatus };
+    try {
+      await updateAppointment(updatedAppointment);
+      // Update local state for instant UI feedback
+      setTodayAppointments((prev) => prev.map((a) => a.id === appointment.id ? { ...a, status: newStatus } : a));
+      Toast.show({
+        type: 'success',
+        text1: 'Durum güncellendi',
+        text2: `Randevu durumu: ${newStatus}`,
+        position: 'top',
+      });
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Hata',
+        text2: 'Durum güncellenemedi',
+        position: 'top',
+      });
+    }
   };
 
-  const handleComplete = () => {
-    // Burada randevuyu tamamlandı olarak işaretleme işlemi yapılacak
-    setModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    // Burada randevuyu iptal etme işlemi yapılacak
-    setModalVisible(false);
-  };
 
 
   useFocusEffect(
     useCallback(() => {
       const loadAppointments = async () => {
         try {
-          const data = await fetchAppointments();
-          setAppointmentsData(data || {});
+          const appointmentsArr = await fetchAppointmentsWithIds();
+          setAppointmentsData(appointmentsArr || []);
 
-          if (data) {
-            const allAppointments = Object.values(data);
-            setTotalCount(allAppointments.length);
+          if (appointmentsArr && appointmentsArr.length > 0) {
+            setTotalCount(appointmentsArr.length);
 
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -50,7 +60,7 @@ export default function AnaSayfaScreen() {
             startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday start of week
             const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-            const appointmentsToday = allAppointments.filter(app => {
+            const appointmentsToday = appointmentsArr.filter(app => {
               if (!app.date) return false;
               const appDate = new Date(app.date);
               appDate.setHours(0, 0, 0, 0);
@@ -65,7 +75,7 @@ export default function AnaSayfaScreen() {
             setTodayAppointments(appointmentsToday);
             setTodayCount(appointmentsToday.length);
 
-            const appointmentsThisWeek = allAppointments.filter(app => {
+            const appointmentsThisWeek = appointmentsArr.filter(app => {
               if (!app.date) return false;
               const appDate = new Date(app.date);
               appDate.setHours(0, 0, 0, 0);
@@ -73,7 +83,7 @@ export default function AnaSayfaScreen() {
             });
             setWeekCount(appointmentsThisWeek.length);
 
-            const appointmentsThisMonth = allAppointments.filter(app => {
+            const appointmentsThisMonth = appointmentsArr.filter(app => {
               if (!app.date) return false;
               const appDate = new Date(app.date);
               appDate.setHours(0, 0, 0, 0);
@@ -144,45 +154,45 @@ export default function AnaSayfaScreen() {
           </View>
 
           {/* Bugünün Randevuları */}
+          <Text className="text-gray-500 font-oswald text-center text-base mb-2">Randevu hakkında detay için randevuya tıklayınız</Text>
           <Animated.View 
             entering={FadeInUp.delay(1000).springify()}
             className="bg-dark-gray p-4 rounded-lg"
           >
             <Text className="text-white font-oswald text-xl mb-4">Bugünün Randevuları</Text>
             {todayAppointments.length > 0 ? (todayAppointments.map((appointment, index) => (
-              <Animated.View
+              <TouchableOpacity
                 key={`${appointment.id || index}`}
-                entering={FadeInUp.delay(1200 + (index * 200)).springify()}
-                className="bg-light-blue p-3 rounded-lg mb-3"
+                onPress={() => handleAppointmentPress(appointment)}
               >
-                <TouchableOpacity onPress={() => handleAppointmentPress(appointment)}>
+                <Animated.View
+                  entering={FadeInUp.delay(1200 + (index * 200)).springify()}
+                  className="bg-light-blue rounded-xl p-4 mb-3"
+                >
                   <View className="flex-row justify-between items-start">
                     <View>
                       <View className="flex-row items-center">
                         <FontAwesome name="clock-o" size={20} color="#0B1215" />
-                        <Text className="text-dark font-oswald ml-2">{appointment.time || '--:--'}</Text>
+                        <Text className="text-dark font-oswald text-base ml-2">{appointment.time || '--:--'}</Text>
                       </View>
                       {appointment.note && (
-                        <View className="flex-row items-center mt-1 ">
-                          <FontAwesome name="sticky-note-o" size={14} color="#0B1215" />
-                          <Text className="text-dark font-oswald text-sm ml-1">Not var</Text>
+                        <View className="flex-row items-center mt-3 ml-2">
+                          <FontAwesome name="sticky-note-o" size={16} color="#0B1215" />
+                          <Text className="text-dark font-oswald text-base ml-1">Not var</Text>
                         </View>
                       )}
                     </View>
                     <View className="items-center justify-center">
                       <Text className="text-dark font-oswald text-sm">Durum</Text>
-                      <Text className={`text-dark font-oswald text-lg ${appointment.status === 'Beklemede' ? 'text-yellow-600' : appointment.status === 'Tamamlandı' ? 'text-green-600' : 'text-red-600'}`}>
-                        {appointment.status || '--'}
-                        
-                      </Text>
+                      <Text className={`text-dark font-oswald text-lg ${appointment.status === 'Beklemede' ? 'text-yellow-600' : appointment.status === 'Tamamlandı' ? 'text-green-600' : 'text-red-600'}`}>{appointment.status || '--'}</Text>
                     </View>
                     <View className="items-end">
-                      <Text className="text-dark font-oswald">{appointment.customerName || 'Bilinmiyor'}</Text>
-                      <Text className="text-dark font-oswald text-sm mt-2">{appointment.phoneNumber || '--'}</Text>
+                      <Text className="text-dark font-oswald text-lg">{appointment.customerName || 'Bilinmiyor'}</Text>
+                      <Text className="text-dark font-oswald text-base">{appointment.phoneNumber}</Text>
                     </View>
                   </View>
-                </TouchableOpacity>
-              </Animated.View>
+                </Animated.View>
+              </TouchableOpacity>
             ))): (
               <Text className="text-gray-400 font-oswald text-center mt-3">
                 Bugün için randevu bulunamadı.

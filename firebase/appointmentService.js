@@ -42,6 +42,23 @@ export const fetchAppointments = async () => {
   }
 };
 
+export const fetchAppointmentsWithIds = async () => {
+  try {
+    const appointmentsRef = ref(rtdb, 'appointments');
+    const snapshot = await get(appointmentsRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      // Map each appointment to include its Firebase key as 'id'
+      return Object.entries(data).map(([id, value]) => ({ ...value, id }));
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching appointments with ids:', error);
+    throw error;
+  }
+};
+
 export const updateAppointment = async (appointmentData) => {
   try {
     const appointmentRef = ref(rtdb, `appointments/${appointmentData.id}`);

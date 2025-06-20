@@ -1,10 +1,11 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { registerUser } from '../../firebase/authSystem'; // Kendi yazdığımız kayıt fonksiyonu
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+
 
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().required('Ad Soyad zorunludur'),
@@ -34,6 +35,7 @@ export default function RegisterScreen() {
       Alert.alert('Kayıt Hatası', e.message);
     }
   };
+
 
   return (
     <SafeAreaView className="flex-1 bg-dark p-5">

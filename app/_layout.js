@@ -7,6 +7,7 @@ import '../global.css'; // NativeWind styles
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import Toast from 'react-native-toast-message';
 
 function RootLayoutNav() {
   const [fontsLoaded] = useFonts({
@@ -30,7 +31,7 @@ function RootLayoutNav() {
       return () => unsubscribe();
     } else {
       console.error('Firebase Auth başlatılamadı veya undefined.');
-      setIsAuthenticating(false); // Auth objesi yoksa da yüklenmeyi bitir
+      setIsAuthenticating(false); 
     }
   }, []);
 
@@ -64,6 +65,7 @@ function RootLayoutNav() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(stack)" options={{ headerShown: false }} />
       </Stack>
+      <Toast />
     </>
   );
 }
@@ -72,6 +74,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <RootLayoutNav />
+      <Toast />
     </AuthProvider>
   );
 } 

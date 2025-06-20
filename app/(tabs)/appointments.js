@@ -133,8 +133,9 @@ export default function AppointmentsScreen() {
                         } : {})
                     }}
                 />
-                <Text className="text-gray-500 font-oswald text-center text-base mt-5">Randevu hakkında detay için randevuya tıklayınız</Text>
-                <View className="px-5 mt-5">
+                <Text className="text-gray-500 font-oswald text-center text-base mb-2">Randevu hakkında detay için randevuya tıklayınız</Text>
+                <View className="bg-dark-gray p-4 rounded-lg mx-6">
+                    <Text className="text-white font-oswald text-xl mb-4">Seçilen Günün Randevuları</Text>
                     {selectedDate ? (
                         selectedAppointments.length > 0 ? (
                             selectedAppointments.sort((a, b) => a.time.localeCompare(b.time)).map((appointment, index) => (
@@ -143,7 +144,7 @@ export default function AppointmentsScreen() {
                                     onPress={() => handleAppointmentPress(appointment)}
                                 >
                                     <Animated.View
-                                        entering={FadeInDown.delay(index * 100)} 
+                                        entering={FadeInDown.delay(index * 100)}
                                         exiting={FadeOutUp}
                                         className="bg-light-blue rounded-xl p-4 mb-3"
                                     >
@@ -159,6 +160,10 @@ export default function AppointmentsScreen() {
                                                         <Text className="text-dark font-oswald text-base ml-1">Not var</Text>
                                                     </View>
                                                 )}
+                                            </View>
+                                            <View className="items-center justify-center">
+                                                <Text className="text-dark font-oswald text-sm">Durum</Text>
+                                                <Text className={`text-dark font-oswald text-lg ${appointment.status === 'Beklemede' ? 'text-yellow-600' :  'text-green-600'}`}>{appointment.status || '--'}</Text>
                                             </View>
                                             <View className="items-end">
                                                 <Text className="text-dark font-oswald text-lg">{appointment.customerName || 'Bilinmiyor'}</Text>
