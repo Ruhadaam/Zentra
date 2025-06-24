@@ -1,23 +1,20 @@
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
-// import { StyleSheet } from 'react-native'; // StyleSheet artık kullanılmayacak
+import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { logoutUser } from '../../firebase/authSystem'; // signOut fonksiyonunu içe aktaralım
+import { logoutUser } from '../../firebase/authSystem';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../context/AuthContext';
 
-export default function ProfileScreen() { // İsimlendirmeyi ProfileScreen olarak güncelleyelim
+export default function ProfileScreen() {
   const router = useRouter();
+  const { user, userProfile, loading } = useAuth();
 
   const handleLogout = async () => {
     try {
       await logoutUser();
-      // Başarılı çıkış sonrası login ekranına yönlendir
-      // Yönlendirme _layout.js tarafından otomatik yapılacaktır,
-      // ancak emin olmak için buraya da ekleyebiliriz.
-      // router.replace('/(auth)/login');
-      console.log("Kullanıcı çıkış yaptı");
+      console.log('Kullanıcı çıkış yaptı');
     } catch (error) {
-      console.error("Çıkış yaparken hata oluştu:", error.message);
-      Alert.alert("Çıkış Hatası", error.message);
+      console.error('Çıkış yaparken hata oluştu:', error.message);
+      Alert.alert('Çıkış Hatası', error.message);
     }
   };
 
@@ -26,46 +23,35 @@ export default function ProfileScreen() { // İsimlendirmeyi ProfileScreen olara
       <ScrollView className="flex-1">
         <Text className="text-white text-3xl font-oswald mb-8 text-center">Profil</Text>
 
-        {/* Profil Bilgileri */}
+    
+
+        {/* Profil Detayları */}
         <TouchableOpacity
-          className="bg-dark-gray p-4 rounded-lg mb-4"
-          onPress={() => { /* Profil bilgileri sayfasına yönlendirme veya modal açma */ console.log('Profil Bilgileri tıklandı'); }}
+          className="bg-light-blue p-4 rounded-lg mb-4"
+          onPress={() => router.push({ pathname: '/(stack)/profile-details' })}
         >
-          <Text className="text-white font-oswald text-lg">Profil Bilgileri</Text>
+          <Text className="text-dark font-oswald text-lg text-center">Profil Detayları</Text>
         </TouchableOpacity>
 
-        {/* Ayarlar */}
+        
         <TouchableOpacity
           className="bg-dark-gray p-4 rounded-lg mb-4"
-          onPress={() => { /* Ayarlar sayfasına yönlendirme veya modal açma */ console.log('Ayarlar tıklandı'); }}
+          onPress={() => { console.log('Bildirimler tıklandı'); }}
         >
-          <Text className="text-white font-oswald text-lg">Ayarlar</Text>
+          <Text className="text-white font-oswald text-lg">Bildirim Ayarları</Text>
         </TouchableOpacity>
-
-        {/* Bildirimler */}
-        <TouchableOpacity
-          className="bg-dark-gray p-4 rounded-lg mb-4"
-          onPress={() => { /* Bildirim ayarları sayfasına yönlendirme */ console.log('Bildirimler tıklandı'); }}
-        >
-          <Text className="text-white font-oswald text-lg">Bildirimler</Text>
-        </TouchableOpacity>
-
-        {/* Submit Feedback */}
         <TouchableOpacity
           className="bg-dark-gray p-4 rounded-lg mb-8"
-          onPress={() => { /* Geri bildirim gönderme ekranına yönlendirme */ console.log('Geri Bildirim Gönder tıklandı'); }}
+          onPress={() => { console.log('Geri Bildirim Gönder tıklandı'); }}
         >
           <Text className="text-white font-oswald text-lg">Geri Bildirim Gönder</Text>
         </TouchableOpacity>
-
-        {/* Çıkış Yap */}
         <TouchableOpacity
           className="bg-red-500 p-4 rounded-lg"
           onPress={handleLogout}
         >
           <Text className="text-white font-oswald text-lg text-center">Çıkış Yap</Text>
         </TouchableOpacity>
-
       </ScrollView>
     </SafeAreaView>
   );

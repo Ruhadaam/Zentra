@@ -11,6 +11,13 @@ export default function StackLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="profile-details"
+        options={{
+          title: 'Profil Detayları',
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

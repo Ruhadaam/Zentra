@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { deleteAppointment, updateAppointment } from '../../firebase/appointmentService';
 import { useState, useRef } from 'react';
+import Header from '../../components/Header';
 
 export default function DetailsScreen() {
   const router = useRouter();
@@ -48,16 +49,7 @@ export default function DetailsScreen() {
     <SafeAreaView className="bg-dark flex-1">
       <View className="p-5">
         {/* Header */}
-        <View className="flex-row justify-between items-center mb-8">
-          <TouchableOpacity 
-            onPress={() => router.back()}
-            className="bg-light-blue p-2 rounded-lg"
-          >
-            <Ionicons name="arrow-back" size={24} color="#0B1215" />
-          </TouchableOpacity>
-          <Text className="text-white text-2xl font-oswald">Randevu Detayları</Text>
-          <View className="w-10" /> 
-        </View>
+        <Header title="Randevu Detayları" />
 
         {/* Müşteri Bilgileri */}
         <View className="bg-light-blue rounded-xl p-4 mb-4">

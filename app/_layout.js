@@ -8,6 +8,8 @@ import { auth } from '../firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Toast from 'react-native-toast-message';
+import { UserProvider } from './context/UserContext';
+
 
 function RootLayoutNav() {
   const [fontsLoaded] = useFonts({
@@ -58,8 +60,10 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <RootLayoutNav />
-      <Toast />
+      <UserProvider>
+        <RootLayoutNav />
+        <Toast />
+      </UserProvider>
     </AuthProvider>
   );
 } 
