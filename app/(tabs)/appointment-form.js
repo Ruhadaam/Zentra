@@ -7,6 +7,8 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { Ionicons } from '@expo/vector-icons';
 import { saveAppointment } from '../../firebase/appointmentService';
+import { Platform } from 'react-native';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const validationSchema = Yup.object().shape({
   customerName: Yup.string()
@@ -25,6 +27,8 @@ const validationSchema = Yup.object().shape({
 export default function AppointmentFormScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
 
   const initialValues = {
     customerName: '',
@@ -44,6 +48,20 @@ export default function AppointmentFormScreen() {
       console.error('Error saving appointment:', error);
       Alert.alert('Hata', 'Randevu kaydedilirken bir hata oluştu.');
     }
+  };
+
+  const showDatePickerModal = () => setDatePickerVisibility(true);
+  const hideDatePickerModal = () => setDatePickerVisibility(false);
+  const handleConfirmDate = (date) => {
+    setFieldValue('date', date);
+    hideDatePickerModal();
+  };
+
+  const showTimePickerModal = () => setTimePickerVisibility(true);
+  const hideTimePickerModal = () => setTimePickerVisibility(false);
+  const handleConfirmTime = (time) => {
+    setFieldValue('time', time);
+    hideTimePickerModal();
   };
 
   return (
@@ -79,26 +97,19 @@ export default function AppointmentFormScreen() {
                 <Text className="text-white font-oswald mb-2">Tarih *</Text>
                 <TouchableOpacity
                   className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base flex-row items-center justify-between"
-                  onPress={() => setShowDatePicker(true)}
+                  onPress={showDatePickerModal}
                 >
                   <Text className="text-white font-ancizar text-base">
                     {values.date.toLocaleDateString('tr-TR')}
                   </Text>
                   <Ionicons name="calendar" size={24} color="#6C757D" />
                 </TouchableOpacity>
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={values.date}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      setShowDatePicker(false);
-                      if (selectedDate) {
-                        setFieldValue('date', selectedDate);
-                      }
-                    }}
-                  />
-                )}
+                <DateTimePickerModal
+                  isVisible={isDatePickerVisible}
+                  mode="date"
+                  onConfirm={handleConfirmDate}
+                  onCancel={hideDatePickerModal}
+                />
                 {touched.date && errors.date && (
                   <Text className="text-red-500 text-sm mt-1">{errors.date}</Text>
                 )}
@@ -109,26 +120,19 @@ export default function AppointmentFormScreen() {
                 <Text className="text-white font-oswald mb-2">Saat *</Text>
                 <TouchableOpacity
                   className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base flex-row items-center justify-between"
-                  onPress={() => setShowTimePicker(true)}
+                  onPress={showTimePickerModal}
                 >
                   <Text className="text-white text-base font-ancizar">
                     {values.time.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                   </Text>
                   <Ionicons name="time-outline" size={24} color="#6C757D" />
                 </TouchableOpacity>
-                {showTimePicker && (
-                  <DateTimePicker
-                    value={values.time}
-                    mode="time"
-                    display="default"
-                    onChange={(event, selectedTime) => {
-                      setShowTimePicker(false);
-                      if (selectedTime) {
-                        setFieldValue('time', selectedTime);
-                      }
-                    }}
-                  />
-                )}
+                <DateTimePickerModal
+                  isVisible={isTimePickerVisible}
+                  mode="time"
+                  onConfirm={handleConfirmTime}
+                  onCancel={hideTimePickerModal}
+                />
                 {touched.time && errors.time && (
                   <Text className="text-red-500 text-sm mt-1">{errors.time}</Text>
                 )}

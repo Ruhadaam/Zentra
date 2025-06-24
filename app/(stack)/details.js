@@ -169,7 +169,7 @@ export default function DetailsScreen() {
               placeholder="Not"
               placeholderTextColor="#0B121580"
               multiline
-              style={{ minHeight: 100, textAlignVertical: 'top' }}
+              style={{  textAlignVertical: 'top' }}
             />
           ) : (
           <Text className="text-dark text-base font-ancizar" style={{ flexWrap: 'wrap' }}>

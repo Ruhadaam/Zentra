@@ -3,7 +3,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import { loginUser as firebaseLoginUser } from '../../firebase/authSystem'; // Import loginUser with alias
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
       setUser(user);
       setLoading(false);
     });
-    return () => unsubscribe();
+    return unsubscribe;
   }, []);
 
   const login = async (email, password) => {
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

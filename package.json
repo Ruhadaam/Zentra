@@ -11,7 +11,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
     "@react-native-async-storage/async-storage": "^1.24.0",
-    "@react-native-community/datetimepicker": "^8.3.0",
+    "@react-native-community/datetimepicker": "^8.4.2",
     "@react-native-picker/picker": "^2.11.0",
     "expo": "~53.0.9",
     "expo-blur": "~14.1.4",
@@ -26,6 +26,7 @@
     "react-native": "0.79.2",
     "react-native-calendars": "^1.1312.0",
     "react-native-dotenv": "^3.4.11",
+    "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-toast-message": "^2.3.0",
     "react-native-wheely": "^0.6.0",

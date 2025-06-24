@@ -16,24 +16,9 @@ function RootLayoutNav() {
     'Ancizar-Serif': require('../assets/fonts/Ancizar-Serif.ttf'),
   });
 
-  const [user, setUser] = useState(null);
-  const [isAuthenticating, setIsAuthenticating] = useState(true);
   const router = useRouter();
   const segments = useSegments();
   const { user: authUser, loading } = useAuth();
-
-  useEffect(() => {
-    if (auth) {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        setUser(user);
-        setIsAuthenticating(false);
-      });
-      return () => unsubscribe();
-    } else {
-      console.error('Firebase Auth başlatılamadı veya undefined.');
-      setIsAuthenticating(false); 
-    }
-  }, []);
 
   useEffect(() => {
     if (loading) return;
