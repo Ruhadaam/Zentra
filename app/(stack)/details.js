@@ -5,6 +5,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { deleteAppointment, updateAppointment } from '../../firebase/appointmentService';
 import { useState, useRef } from 'react';
 import Header from '../../components/Header';
+import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import Toast from 'react-native-toast-message';
 
 export default function DetailsScreen() {
   const router = useRouter();
@@ -15,6 +18,26 @@ export default function DetailsScreen() {
   const [editedAppointment, setEditedAppointment] = useState(appointment);
   const originalAppointmentRef = useRef(appointment);
 
+  // Date/Time picker state
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+
+  const showDatePickerModal = () => setDatePickerVisibility(true);
+  const hideDatePickerModal = () => setDatePickerVisibility(false);
+  const handleConfirmDate = (date) => {
+    setEditedAppointment({ ...editedAppointment, date: date.toISOString().split('T')[0] });
+    hideDatePickerModal();
+  };
+
+  const showTimePickerModal = () => setTimePickerVisibility(true);
+  const hideTimePickerModal = () => setTimePickerVisibility(false);
+  const handleConfirmTime = (time) => {
+    // Saat: HH:mm formatında kaydet
+    const formatted = time.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+    setEditedAppointment({ ...editedAppointment, time: formatted });
+    hideTimePickerModal();
+  };
+
   const handleEdit = () => {
     setIsEditing(true);
     setEditedAppointment(appointment);
@@ -24,9 +47,20 @@ export default function DetailsScreen() {
   const handleDelete = async () => {
     try {
       await deleteAppointment(appointment.id);
+      Toast.show({
+        type: 'success',
+        text1: 'Randevu silindi',
+        position: 'top',
+      });
       router.back();
     } catch (error) {
       console.error('Failed to delete appointment:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Silme başarısız',
+        text2: error.message,
+        position: 'top',
+      });
     }
     console.log('Silme tıklandı');
   };
@@ -35,8 +69,19 @@ export default function DetailsScreen() {
     try {
       await updateAppointment(editedAppointment);
       setIsEditing(false);
+      Toast.show({
+        type: 'success',
+        text1: 'Randevu güncellendi',
+        position: 'top',
+      });
     } catch (error) {
       console.error('Failed to update appointment:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Güncelleme başarısız',
+        text2: error.message,
+        position: 'top',
+      });
     }
   };
 
@@ -45,180 +90,218 @@ export default function DetailsScreen() {
     setEditedAppointment(originalAppointmentRef.current);
   };
 
+  // Yardımcı fonksiyon
+  const displayValue = (value) => (value && value !== '' ? value : '-');
+
   return (
-    <SafeAreaView className="bg-dark flex-1">
-      <View className="p-5">
-        {/* Header */}
-        <Header title="Randevu Detayları" />
+    <SafeAreaView style={{ flex: 1 }} className="bg-dark">
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+      >
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          contentContainerStyle={{ padding: 20, flexGrow: 1 }}
+        >
+          <View className="p-5">
+            {/* Header */}
+            <Header title="Randevu Detayları" />
 
-        {/* Müşteri Bilgileri */}
-        <View className="bg-light-blue rounded-xl p-4 mb-4">
-          <View className="flex-row items-center mb-4">
-            <Ionicons name="person" size={24} color="#0B1215" />
-            {isEditing ? (
-              <TextInput
-                className="text-dark text-xl font-oswald ml-2 border-b border-dark/30 flex-1"
-                value={editedAppointment.customerName}
-                onChangeText={(text) => setEditedAppointment({ ...editedAppointment, customerName: text })}
-                placeholder="Müşteri Adı"
-                placeholderTextColor="#0B121580"
-              />
-            ) : (
-              <Text className="text-dark text-xl font-oswald ml-2">
-                {editedAppointment.customerName}
-              </Text>
-            )}
-          </View>
-          
-          <View className="flex-row items-center mb-3">
-            <Ionicons name="calendar" size={20} color="#0B1215" />
-            {isEditing ? (
-               <TextInput
-                 className="text-dark text-lg font-oswald ml-2 border-b border-dark/30 flex-1"
-                 value={editedAppointment.date}
-                 onChangeText={(text) => setEditedAppointment({ ...editedAppointment, date: text })}
-                 placeholder="Tarih (YYYY-MM-DD)"
-                 placeholderTextColor="#0B121580"
-               />
-            ) : (
-              <Text className="text-dark text-lg font-oswald ml-2">
-                {editedAppointment.date}
-              </Text>
-            )}
-          </View>
+            {/* Müşteri Bilgileri */}
+            <View className=" rounded-xl p-4 mb-4">
+              {/* Müşteri Adı */}
+              {isEditing ? (
+                <View className="flex-row items-center mb-4">
+                  <Ionicons name="person" size={24} color="white" />
+                  <TextInput
+                    className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base flex-1 ml-2"
+                    value={editedAppointment.customerName}
+                    onChangeText={(text) => setEditedAppointment({ ...editedAppointment, customerName: text })}
+                    placeholder="Müşteri adını girin"
+                    placeholderTextColor="#6C757D"
+                  />
+                </View>
+              ) : (
+                <View className="flex-row items-center mb-4">
+                  <Ionicons name="person" size={24} color="white" />
+                  <Text className="text-white text-lg font-ancizar ml-2">
+                    {displayValue(editedAppointment.customerName)}
+                  </Text>
+                </View>
+              )}
 
-          <View className="flex-row items-center mb-3">
-            <Ionicons name="time" size={20} color="#0B1215" />
-            {isEditing ? (
-              <TextInput
-                className="text-dark text-lg font-oswald ml-2 border-b border-dark/30 flex-1"
-                value={editedAppointment.time}
-                onChangeText={(text) => setEditedAppointment({ ...editedAppointment, time: text })}
-                placeholder="Saat (HH:mm)"
-                placeholderTextColor="#0B121580"
-              />
-            ) : (
-              <Text className="text-dark text-lg font-oswald ml-2">
-                {editedAppointment.time}
-              </Text>
-            )}
-          </View>
-
-          <View className="flex-row items-center mb-3">
-            <Ionicons name="call" size={20} color="#0B1215" />
-            {isEditing ? (
-              <TextInput
-                className="text-dark text-lg font-oswald ml-2 border-b border-dark/30 flex-1"
-                value={editedAppointment.phoneNumber}
-                onChangeText={(text) => setEditedAppointment({ ...editedAppointment, phoneNumber: text })}
-                placeholder="Telefon Numarası"
-                placeholderTextColor="#0B121580"
-                keyboardType="phone-pad"
-              />
-            ) : (
-              <Text className="text-dark text-lg font-oswald ml-2">
-                {editedAppointment.phoneNumber}
-              </Text>
-            )}
-          </View>
-
-          <View className="flex-row items-center mb-3">
-            <Ionicons name="information-circle" size={20} color="#0B1215" />
-             {isEditing ? (
-              <View className="flex-row ml-2 flex-1">
-                <TouchableOpacity
-                  className={`p-2 rounded-md mr-2 ${editedAppointment.status?.toLowerCase() === 'beklemede' ? 'bg-dark' : 'bg-dark/50'}`}
-                  onPress={() => setEditedAppointment({ ...editedAppointment, status: 'Beklemede' })}
-                >
-                  <Text className="text-white text-sm font-oswald">Beklemede</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`p-2 rounded-md ${editedAppointment.status?.toLowerCase() === 'tamamlandı' ? 'bg-dark' : 'bg-dark/50'}`}
-                  onPress={() => setEditedAppointment({ ...editedAppointment, status: 'Tamamlandı' })}
-                >
-                  <Text className="text-white text-sm font-oswald">Tamamlandı</Text>
-                </TouchableOpacity>
+              {/* Tarih */}
+              <View className="flex-row items-center my-3">
+                <Ionicons name="calendar" size={20} color="white" />
+                {isEditing ? (
+                  <TouchableOpacity
+                    className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base flex-1 ml-2 flex-row items-center justify-between"
+                    onPress={showDatePickerModal}
+                  >
+                    <Text className="text-white font-ancizar text-base">
+                      {displayValue(editedAppointment.date)}
+                    </Text>
+                    <Ionicons name="calendar" size={24} color="#6C757D" />
+                  </TouchableOpacity>
+                ) : (
+                  <Text className="text-white text-lg font-ancizar ml-2">
+                    {displayValue(editedAppointment.date)}
+                  </Text>
+                )}
+                <DateTimePickerModal
+                  isVisible={isDatePickerVisible}
+                  mode="date"
+                  onConfirm={handleConfirmDate}
+                  onCancel={hideDatePickerModal}
+                />
               </View>
-            ) : (
-            <Text className="text-dark text-lg font-oswald ml-2">
-              {editedAppointment.status}
-            </Text>
-            )}
+
+              {/* Saat */}
+              <View className="flex-row items-center my-3">
+                <Ionicons name="time" size={20} color="white" />
+                {isEditing ? (
+                  <TouchableOpacity
+                    className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base flex-1 ml-2 flex-row items-center justify-between"
+                    onPress={showTimePickerModal}
+                  >
+                    <Text className="text-white text-lg font-ancizar ml-2">
+                      {displayValue(editedAppointment.time)}
+                    </Text>
+                    <Ionicons name="time-outline" size={24} color="#6C757D" />
+                  </TouchableOpacity>
+                ) : (
+                  <Text className="text-white text-lg font-ancizar ml-2">
+                    {displayValue(editedAppointment.time)}
+                  </Text>
+                )}
+                <DateTimePickerModal
+                  isVisible={isTimePickerVisible}
+                  mode="time"
+                  onConfirm={handleConfirmTime}
+                  onCancel={hideTimePickerModal}
+                />
+              </View>
+
+              {/* Telefon */}
+              <View className="flex-row items-center my-3">
+                <Ionicons name="call" size={20} color="white" />
+                {isEditing ? (
+                  <TextInput
+                    className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base flex-1 ml-2"
+                    value={editedAppointment.phoneNumber}
+                    onChangeText={(text) => setEditedAppointment({ ...editedAppointment, phoneNumber: text })}
+                    placeholder="Telefon numarasını girin (opsiyonel)"
+                    placeholderTextColor="#6C757D"
+                    keyboardType="phone-pad"
+                    maxLength={10}11
+                  />
+                ) : (
+                  <Text className="text-white text-lg font-ancizar ml-2">
+                    {displayValue(editedAppointment.phoneNumber)}
+                  </Text>
+                )}
+              </View>
+
+              {/* Durum */}
+              <View className="flex-row items-center my-3">
+                <Ionicons name="information-circle" size={20} color="white" />
+                 {isEditing ? (
+                  <View className="flex-row ml-2 flex-1">
+                    <TouchableOpacity
+                      className={`p-2 rounded-md mr-2 ${editedAppointment.status?.toLowerCase() === 'beklemede' ? 'bg-light-blue' : 'bg-gray-500'}`}
+                      onPress={() => setEditedAppointment({ ...editedAppointment, status: 'Beklemede' })}
+                    >
+                      <Text className="text-black text-sm font-oswald">Beklemede</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className={`p-2 rounded-md ${editedAppointment.status?.toLowerCase() === 'tamamlandı' ? 'bg-light-blue' : 'bg-gray-500'}`}
+                      onPress={() => setEditedAppointment({ ...editedAppointment, status: 'Tamamlandı' })}
+                    >
+                      <Text className="text-black text-sm font-oswald">Tamamlandı</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                <Text className="text-white text-lg font-ancizar ml-2">
+                  {displayValue(editedAppointment.status)}
+                </Text>
+                )}
+              </View>
+                {/* Notlar */}
+              <View className="flex-row items-center my-3">
+                <Ionicons name="document-text" size={20} color="white" />
+                {isEditing ? (
+                  <TextInput
+                    className="border-light-blue border-b-2 text-white p-3 rounded-lg font-ancizar text-base flex-1 ml-2"
+                    value={editedAppointment.note}
+                    onChangeText={(text) => setEditedAppointment({ ...editedAppointment, note: text })}
+                    placeholder="Açıklama ekleyin (opsiyonel)"
+                    placeholderTextColor="#6C757D"
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                  />
+                ) : (
+                  <Text className="text-white text-lg font-ancizar ml-2">
+                    {displayValue(editedAppointment.note)}
+                  </Text>
+                )}
+              </View>
+            </View>
+
+            {/* İşlem Butonları */}
+            <View className="flex-row justify-between">
+              {isEditing ? (
+                <>
+                  <TouchableOpacity 
+                    className="bg-green-500 p-4 rounded-lg flex-1 mr-2"
+                    onPress={handleSave}
+                  >
+                    <View className="flex-row items-center justify-center">
+                      <Ionicons name="save" size={20} color="white" />
+                      <Text className="text-white text-base font-oswald ml-2">Kaydet</Text>
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    className="bg-red-500 p-4 rounded-lg flex-1 ml-2"
+                    onPress={handleCancel}
+                  >
+                    <View className="flex-row items-center justify-center">
+                      <Ionicons name="close" size={20} color="white" />
+                      <Text className="text-white text-base font-oswald ml-2">İptal</Text>
+                    </View>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <TouchableOpacity 
+                    className="bg-light-blue p-4 rounded-lg flex-1 mr-2"
+                    onPress={handleEdit}
+                  >
+                    <View className="flex-row items-center justify-center">
+                      <Ionicons name="create" size={20} color="#0B1215" />
+                      <Text className="text-dark text-base font-oswald ml-2">Düzenle</Text>
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    className="bg-red-500 p-4 rounded-lg flex-1 ml-2"
+                    onPress={handleDelete}
+                  >
+                    <View className="flex-row items-center justify-center">
+                      <Ionicons name="trash" size={20} color="white" />
+                      <Text className="text-white text-base font-oswald ml-2">Sil</Text>
+                    </View>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
           </View>
-        </View>
-
-        {/* Notlar */}
-        <View className="bg-light-blue rounded-xl p-4 mb-6">
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="document-text" size={20} color="#0B1215" />
-            <Text className="text-dark text-lg font-oswald ml-2">Notlar</Text>
-          </View>
-          {isEditing ? (
-            <TextInput
-              className="text-dark text-base font-ancizar border-b border-dark/30 p-2"
-              value={editedAppointment.note}
-              onChangeText={(text) => setEditedAppointment({ ...editedAppointment, note: text })}
-              placeholder="Not"
-              placeholderTextColor="#0B121580"
-              multiline
-              style={{  textAlignVertical: 'top' }}
-            />
-          ) : (
-          <Text className="text-dark text-base font-ancizar" style={{ flexWrap: 'wrap' }}>
-            {editedAppointment.note}
-          </Text>
-          )}
-        </View>
-
-        {/* İşlem Butonları */}
-        <View className="flex-row justify-between">
-          {isEditing ? (
-            <>
-              <TouchableOpacity 
-                className="bg-green-500 p-4 rounded-lg flex-1 mr-2"
-                onPress={handleSave}
-              >
-                <View className="flex-row items-center justify-center">
-                  <Ionicons name="save" size={20} color="white" />
-                  <Text className="text-white text-base font-oswald ml-2">Kaydet</Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                className="bg-red-500 p-4 rounded-lg flex-1 ml-2"
-                onPress={handleCancel}
-              >
-                <View className="flex-row items-center justify-center">
-                  <Ionicons name="close" size={20} color="white" />
-                  <Text className="text-white text-base font-oswald ml-2">İptal</Text>
-                </View>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <TouchableOpacity 
-                className="bg-light-blue p-4 rounded-lg flex-1 mr-2"
-                onPress={handleEdit}
-              >
-                <View className="flex-row items-center justify-center">
-                  <Ionicons name="create" size={20} color="#0B1215" />
-                  <Text className="text-dark text-base font-oswald ml-2">Düzenle</Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                className="bg-red-500 p-4 rounded-lg flex-1 ml-2"
-                onPress={handleDelete}
-              >
-                <View className="flex-row items-center justify-center">
-                  <Ionicons name="trash" size={20} color="white" />
-                  <Text className="text-white text-base font-oswald ml-2">Sil</Text>
-                </View>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
-      </View>
+        </ScrollView>
+        <Toast />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 } 

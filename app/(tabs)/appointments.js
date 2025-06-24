@@ -20,7 +20,9 @@ LocaleConfig.locales['tr'] = {
 LocaleConfig.defaultLocale = 'tr';
 
 export default function AppointmentsScreen() {
-    const [selectedDate, setSelectedDate] = useState('');
+    // Başlangıçta bugünün tarihi seçili olsun
+    const todayString = new Date().toISOString().split('T')[0];
+    const [selectedDate, setSelectedDate] = useState(todayString);
     const [appointmentsData, setAppointmentsData] = useState({});
     const router = useRouter();
 
