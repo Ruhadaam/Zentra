@@ -2,12 +2,15 @@ import { View, Text, ScrollView, TouchableOpacity, /*Modal,*/ Pressable } from '
 import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import { fetchAppointmentsWithIds, updateAppointment } from '../../firebase/appointmentService';
 import Toast from 'react-native-toast-message';
 import { useUser } from '../context/UserContext';
+import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { requestNotificationPermission, saveUpcomingAppointments, scheduleDailyNotification, setNotificationHandler } from '../../utils/notificationUtils';
 
 export default function AnaSayfaScreen() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -108,6 +111,20 @@ export default function AnaSayfaScreen() {
       loadAppointments();
     }, [uid])
   );
+
+  useEffect(() => {
+    async function setupNotifications() {
+      await requestNotificationPermission();
+      const appointmentsArr = await fetchAppointmentsWithIds(uid);
+      await saveUpcomingAppointments(appointmentsArr || []);
+      await scheduleDailyNotification();
+    }
+    setupNotifications();
+  }, [uid]);
+
+  useEffect(() => {
+    setNotificationHandler();
+  }, []);
 
   return (
     <SafeAreaView className="bg-dark flex-1">
