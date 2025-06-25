@@ -8,8 +8,13 @@ import Header from '../../components/Header';
 import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Toast from 'react-native-toast-message';
+import { useUser } from '../context/UserContext';
+
+
+
 
 export default function DetailsScreen() {
+  
   const router = useRouter();
   const params = useLocalSearchParams();
   const appointment = JSON.parse(params.appointment);
@@ -21,6 +26,8 @@ export default function DetailsScreen() {
   // Date/Time picker state
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+
+  const { uid } = useUser();
 
   const showDatePickerModal = () => setDatePickerVisibility(true);
   const hideDatePickerModal = () => setDatePickerVisibility(false);
@@ -46,7 +53,7 @@ export default function DetailsScreen() {
 
   const handleDelete = async () => {
     try {
-      await deleteAppointment(appointment.id);
+      await deleteAppointment(uid, appointment.id);
       Toast.show({
         type: 'success',
         text1: 'Randevu silindi',
@@ -67,7 +74,7 @@ export default function DetailsScreen() {
 
   const handleSave = async () => {
     try {
-      await updateAppointment(editedAppointment);
+      await updateAppointment(uid, editedAppointment);
       setIsEditing(false);
       Toast.show({
         type: 'success',
@@ -305,3 +312,4 @@ export default function DetailsScreen() {
     </SafeAreaView>
   );
 } 
+

@@ -153,25 +153,25 @@ export default function AppointmentsScreen() {
                                         className="bg-light-blue rounded-xl p-4 mb-3"
                                     >
                                         <View className="flex-row justify-between items-start">
-                                            <View>
+                                            <View className="min-w-[80px] max-w-[100px]">
                                                 <View className="flex-row items-center">
                                                     <FontAwesome name="clock-o" size={20} color="#0B1215" />
-                                                    <Text className="text-dark font-oswald text-base ml-2">{appointment.time || '--:--'}</Text>
+                                                    <Text className="text-dark font-oswald text-base ml-2" numberOfLines={1} ellipsizeMode="tail">{appointment.time || '--:--'}</Text>
                                                 </View>
                                                 {appointment.note && (
                                                     <View className="flex-row items-center mt-3 ml-2">
                                                         <FontAwesome name="sticky-note-o" size={16} color="#0B1215" />
-                                                        <Text className="text-dark font-oswald text-base ml-1">Not var</Text>
+                                                        <Text className="text-dark font-oswald text-base ml-1" numberOfLines={1} ellipsizeMode="tail">Not var</Text>
                                                     </View>
                                                 )}
                                             </View>
-                                            <View className="items-center justify-center">
+                                            <View className="items-center justify-center min-w-[80px] max-w-[90px]">
                                                 <Text className="text-dark font-oswald text-sm">Durum</Text>
-                                                <Text className={`text-dark font-oswald text-lg ${appointment.status === 'Beklemede' ? 'text-yellow-600' :  'text-green-600'}`}>{appointment.status || '--'}</Text>
+                                                <Text className={`text-dark font-oswald text-lg ${appointment.status === 'Beklemede' ? 'text-yellow-600' :  'text-green-600'}`} numberOfLines={1} ellipsizeMode="tail">{appointment.status || '--'}</Text>
                                             </View>
-                                            <View className="items-end">
-                                                <Text className="text-dark font-oswald text-lg">{appointment.customerName || 'Bilinmiyor'}</Text>
-                                                <Text className="text-dark font-oswald text-base">{appointment.phoneNumber}</Text>
+                                            <View className="items-end min-w-[100px] max-w-[120px]">
+                                                <Text className="text-dark font-oswald text-lg" numberOfLines={1} ellipsizeMode="tail">{appointment.customerName || 'Bilinmiyor'}</Text>
+                                                <Text className="text-dark font-oswald text-base" numberOfLines={1} ellipsizeMode="tail">{appointment.phoneNumber}</Text>
                                             </View>
                                         </View>
                                     </Animated.View>

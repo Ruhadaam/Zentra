@@ -57,9 +57,9 @@ export const fetchAppointmentsWithIds = async (uid) => {
   }
 };
 
-export const updateAppointment = async (appointmentData) => {
+export const updateAppointment = async (uid, appointmentData) => {
   try {
-    const appointmentRef = ref(rtdb, `appointments/${appointmentData.id}`);
+    const appointmentRef = ref(rtdb, `appointments/${uid}/${appointmentData.id}`);
     // Prepare data for update - exclude id and createdAt if they should not be updated
     const dataToUpdate = { ...appointmentData };
     delete dataToUpdate.id;
@@ -73,9 +73,9 @@ export const updateAppointment = async (appointmentData) => {
   }
 };
 
-export const deleteAppointment = async (appointmentId) => {
+export const deleteAppointment = async (uid, appointmentId) => {
   try {
-    const appointmentRef = ref(rtdb, `appointments/${appointmentId}`);
+    const appointmentRef = ref(rtdb, `appointments/${uid}/${appointmentId}`);
     await remove(appointmentRef);
     console.log('Appointment deleted successfully');
   } catch (error) {

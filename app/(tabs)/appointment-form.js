@@ -123,6 +123,13 @@ export default function AppointmentFormScreen() {
                     onConfirm={handleConfirmDate}
                     onCancel={hideDatePickerModal}
                     onDismiss={hideDatePickerModal}
+                    pickerContainerStyleIOS={{
+                      alignSelf: 'center', // ortalar
+                      width: '75%',
+                      borderRadius: 16,
+                      backgroundColor: 'white',
+                    }}
+                    
                   />
                   {touched.date && errors.date && (
                     <Text className="text-red-500 text-sm mt-1">{errors.date}</Text>
@@ -147,6 +154,12 @@ export default function AppointmentFormScreen() {
                     onConfirm={handleConfirmTime}
                     onCancel={hideTimePickerModal}
                     onDismiss={hideTimePickerModal}
+                    pickerContainerStyleIOS={{
+                      alignSelf: 'center', // ortalar
+                      width: '75%',
+                      borderRadius: 16,
+                      backgroundColor: 'white',
+                    }}
                   />
                   {touched.time && errors.time && (
                     <Text className="text-red-500 text-sm mt-1">{errors.time}</Text>
