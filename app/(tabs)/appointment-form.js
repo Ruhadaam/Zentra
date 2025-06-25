@@ -10,6 +10,7 @@ import { saveAppointment } from '../../firebase/appointmentService';
 import { Platform } from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Toast from 'react-native-toast-message';
+import { useAuth } from '../context/AuthContext';
 
 const validationSchema = Yup.object().shape({
   customerName: Yup.string()
@@ -35,10 +36,12 @@ export default function AppointmentFormScreen() {
     status: 'Beklemede'
   };
 
+  const { user } = useAuth();
+
   const handleSubmit = async (values, resetForm) => {
     console.log('Form Data:', values);
     try {
-      await saveAppointment(values);
+      await saveAppointment(user.uid, values);
       Toast.show({
         type: 'success',
         text1: 'Randevu başarıyla kaydedildi',

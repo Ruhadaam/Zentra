@@ -1,40 +1,38 @@
 import { ref, push, set, get, update, remove } from 'firebase/database';
 import { rtdb } from '../firebaseConfig';
 
-export const saveAppointment = async (appointmentData) => {
+// Randevu kaydetme
+export const saveAppointment = async (uid, appointmentData) => {
   try {
-    // Format date to YYYY-MM-DD and time to HH:mm before saving
     const formattedAppointmentData = {
       ...appointmentData,
-      date: appointmentData.date ? appointmentData.date.toISOString().split('T')[0] : '', // Format date as YYYY-MM-DD
-      time: appointmentData.time ? appointmentData.time.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '', // Format time as HH:mm
-      createdAt: new Date().toISOString(), // Add a timestamp
+      date: appointmentData.date ? appointmentData.date.toISOString().split('T')[0] : '',
+      time: appointmentData.time ? appointmentData.time.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '',
+      createdAt: new Date().toISOString(),
     };
 
-    // Use push to generate a unique key for the new appointment
-    const newAppointmentRef = push(ref(rtdb, 'appointments'));
+    const newAppointmentRef = push(ref(rtdb, `appointments/${uid}`));
     await set(newAppointmentRef, formattedAppointmentData);
     console.log('Appointment saved successfully');
-    return newAppointmentRef.key; // Return the unique key
+    return newAppointmentRef.key;
   } catch (error) {
     console.error('Error saving appointment:', error);
     throw error;
   }
 };
 
-export const fetchAppointments = async () => {
+// Sadece giriş yapan kullanıcının randevularını çek
+export const fetchAppointments = async (uid) => {
   try {
-    const appointmentsRef = ref(rtdb, 'appointments');
-    const snapshot = await get(appointmentsRef);
+    const snapshot = await get(ref(rtdb, `appointments/${uid}`));
+
     if (snapshot.exists()) {
       const data = snapshot.val();
-      // Firebase returns data as an object of objects, convert to array if needed
-      // For this use case (grouping by date), returning the object might be better.
       console.log('Appointments fetched successfully!');
-      return data; // Returns the object with firebase keys
+      return data;
     } else {
       console.log('No appointments data available');
-      return {}; // Return empty object if no data
+      return {};
     }
   } catch (error) {
     console.error('Error fetching appointments:', error);
@@ -42,9 +40,9 @@ export const fetchAppointments = async () => {
   }
 };
 
-export const fetchAppointmentsWithIds = async () => {
+export const fetchAppointmentsWithIds = async (uid) => {
   try {
-    const appointmentsRef = ref(rtdb, 'appointments');
+    const appointmentsRef = ref(rtdb, `appointments/${uid}`);
     const snapshot = await get(appointmentsRef);
     if (snapshot.exists()) {
       const data = snapshot.val();

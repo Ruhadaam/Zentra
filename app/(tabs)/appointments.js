@@ -8,6 +8,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { fetchAppointments } from '../../firebase/appointmentService';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
+import { useUser } from '../context/UserContext';
 
 LocaleConfig.locales['tr'] = {
     monthNames: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
@@ -25,12 +26,13 @@ export default function AppointmentsScreen() {
     const [selectedDate, setSelectedDate] = useState(todayString);
     const [appointmentsData, setAppointmentsData] = useState({});
     const router = useRouter();
+    const { uid } = useUser();
 
     useFocusEffect(
         useCallback(() => {
             const loadAppointments = async () => {
                 try {
-                    const data = await fetchAppointments();
+                    const data = await fetchAppointments(uid);
                     const groupedByDate = {};
                     if (data) {
                         Object.keys(data).forEach(key => {
@@ -73,7 +75,7 @@ export default function AppointmentsScreen() {
             };
 
             loadAppointments();
-        }, [])
+        }, [uid])
     );
 
     const selectedAppointments = appointmentsData[selectedDate] || [];

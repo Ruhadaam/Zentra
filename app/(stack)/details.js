@@ -195,7 +195,7 @@ export default function DetailsScreen() {
                     placeholder="Telefon numarasını girin (opsiyonel)"
                     placeholderTextColor="#6C757D"
                     keyboardType="phone-pad"
-                    maxLength={10}11
+                    maxLength={10}
                   />
                 ) : (
                   <Text className="text-white text-lg font-ancizar ml-2">

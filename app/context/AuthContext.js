@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("Giriş yapan UID:", user?.uid);
       setUser(user);
       setLoading(false);
     });

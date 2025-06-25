@@ -7,6 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import { fetchAppointmentsWithIds, updateAppointment } from '../../firebase/appointmentService';
 import Toast from 'react-native-toast-message';
+import { useUser } from '../context/UserContext';
 
 export default function AnaSayfaScreen() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -17,6 +18,7 @@ export default function AnaSayfaScreen() {
   const [weekCount, setWeekCount] = useState(0);
   const [monthCount, setMonthCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+  const { uid } = useUser();
 
   const handleAppointmentPress = async (appointment) => {
     // Status toggle logic
@@ -42,13 +44,11 @@ export default function AnaSayfaScreen() {
     }
   };
 
-
-
   useFocusEffect(
     useCallback(() => {
       const loadAppointments = async () => {
         try {
-          const appointmentsArr = await fetchAppointmentsWithIds();
+          const appointmentsArr = await fetchAppointmentsWithIds(uid);
           setAppointmentsData(appointmentsArr || []);
 
           if (appointmentsArr && appointmentsArr.length > 0) {
@@ -106,7 +106,7 @@ export default function AnaSayfaScreen() {
       };
 
       loadAppointments();
-    }, [])
+    }, [uid])
   );
 
   return (

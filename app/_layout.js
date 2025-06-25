@@ -21,6 +21,7 @@ function RootLayoutNav() {
   const router = useRouter();
   const segments = useSegments();
   const { user: authUser, loading } = useAuth();
+  
 
   useEffect(() => {
     if (loading) return;
