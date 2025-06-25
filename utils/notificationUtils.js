@@ -39,7 +39,7 @@ export async function getTodayAppointmentsMessage() {
   return `Bugün ${todaysAppointments.length} adet müşteri senin için gelecek, iyi çalışmalar!`;
 }
 
-export async function scheduleDailyNotification() {
+export async function scheduleDailyNotification(hour = 7, minute = 0) {
   await Notifications.cancelAllScheduledNotificationsAsync();
   await Notifications.scheduleNotificationAsync({
     content: {
@@ -48,8 +48,8 @@ export async function scheduleDailyNotification() {
       sound: true,
     },
     trigger: {
-      hour: 7,
-      minute: 0,
+      hour,
+      minute,
       repeats: true,
     },
   });

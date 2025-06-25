@@ -18,6 +18,13 @@ export default function StackLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="notification-settings"
+        options={{
+          title: 'Bildirim Ayarları',
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

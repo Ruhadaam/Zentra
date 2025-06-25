@@ -35,10 +35,10 @@ export default function ProfileScreen() {
 
         
         <TouchableOpacity
-          className="bg-dark-gray p-4 rounded-lg mb-4"
-          onPress={() => { console.log('Bildirimler tıklandı'); }}
+          className="bg-light-blue p-4 rounded-lg mb-4"
+          onPress={() => router.push({ pathname: '/(stack)/notification-settings' })}
         >
-          <Text className="text-white font-oswald text-lg">Bildirim Ayarları</Text>
+          <Text className="text-dark font-oswald text-lg text-center">Bildirim Ayarları</Text>
         </TouchableOpacity>
         <TouchableOpacity
           className="bg-dark-gray p-4 rounded-lg mb-8"
