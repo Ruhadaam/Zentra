@@ -135,7 +135,7 @@ export default function AnaSayfaScreen() {
             entering={FadeIn.duration(1000)}
             className="text-white text-3xl font-oswald mb-5"
           >
-            Ana Sayfa
+            🏠 Ana Sayfa
           </Animated.Text>
           
           {/* Stats Cards */}
@@ -144,39 +144,39 @@ export default function AnaSayfaScreen() {
               entering={FadeInDown.delay(200).springify()}
               className="bg-dark-gray w-[48%] p-4 rounded-lg mb-4"
             >
-              <Text className="text-white font-oswald text-lg">Bugünkü Randevular</Text>
+              <Text className="text-white font-oswald text-lg">📅 Bugünkü Randevular</Text>
               <Text className="text-light-blue text-2xl font-oswald mt-2">{todayCount}</Text>
             </Animated.View>
             <Animated.View 
               entering={FadeInDown.delay(400).springify()}
               className="bg-dark-gray w-[48%] p-4 rounded-lg mb-4"
             >
-              <Text className="text-white font-oswald text-lg">Bu Hafta</Text>
+              <Text className="text-white font-oswald text-lg">📆 Bu Hafta</Text>
               <Text className="text-light-blue text-2xl font-oswald mt-2">{weekCount}</Text>
             </Animated.View>
             <Animated.View 
               entering={FadeInDown.delay(600).springify()}
               className="bg-dark-gray w-[48%] p-4 rounded-lg"
             >
-              <Text className="text-white font-oswald text-lg">Bu Ay</Text>
+              <Text className="text-white font-oswald text-lg">🗓️ Bu Ay</Text>
               <Text className="text-light-blue text-2xl font-oswald mt-2">{monthCount}</Text>
             </Animated.View>
             <Animated.View 
               entering={FadeInDown.delay(800).springify()}
               className="bg-dark-gray w-[48%] p-4 rounded-lg"
             >
-              <Text className="text-white font-oswald text-lg">Toplam</Text>
+              <Text className="text-white font-oswald text-lg">🔢 Toplam</Text>
               <Text className="text-light-blue text-2xl font-oswald mt-2">{totalCount}</Text>
             </Animated.View>
           </View>
 
           {/* Bugünün Randevuları */}
-          <Text className="text-gray-500 font-oswald text-center text-base mb-2">Randevu hakkında detay için randevuya tıklayınız</Text>
+          <Text className="text-gray-500 font-oswald text-center text-base mb-2">📋 Randevu hakkında detay için randevuya tıklayınız</Text>
           <Animated.View 
             entering={FadeInUp.delay(1000).springify()}
             className="bg-dark-gray p-4 rounded-lg"
           >
-            <Text className="text-white font-oswald text-xl mb-4">Bugünün Randevuları</Text>
+            <Text className="text-white font-oswald text-xl mb-4">📅 Bugünün Randevuları</Text>
             {todayAppointments.length > 0 ? (todayAppointments.map((appointment, index) => (
               <TouchableOpacity
                 key={`${appointment.id || index}`}
@@ -191,23 +191,25 @@ export default function AnaSayfaScreen() {
                     <View className="min-w-[80px] max-w-[100px]">
                       <View className="flex-row items-center">
                         <FontAwesome name="clock-o" size={20} color="#0B1215" />
-                        <Text className="text-dark font-oswald text-base ml-2" numberOfLines={1} ellipsizeMode="tail">{appointment.time || '--:--'}</Text>
+                        <Text className="text-dark font-oswald text-base ml-2" numberOfLines={1} ellipsizeMode="tail">⏰ {appointment.time || '--:--'}</Text>
                       </View>
                       {appointment.note && (
                         <View className="flex-row items-center mt-3 ml-2">
                           <FontAwesome name="sticky-note-o" size={16} color="#0B1215" />
-                          <Text className="text-dark font-oswald text-base ml-1" numberOfLines={1} ellipsizeMode="tail">Not var</Text>
+                          <Text className="text-dark font-oswald text-base ml-1" numberOfLines={1} ellipsizeMode="tail">📝 Not var</Text>
                         </View>
                       )}
                     </View>
                     {/* Durum */}
                     <View className="items-center justify-center min-w-[80px] max-w-[90px]">
                       <Text className="text-dark font-oswald text-sm">Durum</Text>
-                      <Text className={`text-dark font-oswald text-lg ${appointment.status === 'Beklemede' ? 'text-yellow-600' : appointment.status === 'Tamamlandı' ? 'text-green-600' : 'text-red-600'}`} numberOfLines={1} ellipsizeMode="tail">{appointment.status || '--'}</Text>
+                      <Text className={`text-dark font-oswald text-lg ${appointment.status === 'Beklemede' ? 'text-yellow-600' : appointment.status === 'Tamamlandı' ? 'text-green-600' : 'text-red-600'}`} numberOfLines={1} ellipsizeMode="tail">
+                        {appointment.status === 'Beklemede' ? '⏳' : appointment.status === 'Tamamlandı' ? '✅' : '❌'} {appointment.status || '--'}
+                      </Text>
                     </View>
                     {/* Müşteri Adı ve Telefon */}
                     <View className="items-end min-w-[100px] max-w-[120px]">
-                      <Text className="text-dark font-oswald text-lg" numberOfLines={1} ellipsizeMode="tail">{appointment.customerName || 'Bilinmiyor'}</Text>
+                      <Text className="text-dark font-oswald text-lg" numberOfLines={1} ellipsizeMode="tail">👤 {appointment.customerName || 'Bilinmiyor'}</Text>
                       <Text className="text-dark font-oswald text-base" numberOfLines={1} ellipsizeMode="tail">{appointment.phoneNumber}</Text>
                     </View>
                   </View>
@@ -215,7 +217,7 @@ export default function AnaSayfaScreen() {
               </TouchableOpacity>
             ))): (
               <Text className="text-gray-400 font-oswald text-center mt-3">
-                Bugün için randevu bulunamadı.
+                😴 Bugün için randevu bulunamadı.
               </Text>
             )}
           </Animated.View>

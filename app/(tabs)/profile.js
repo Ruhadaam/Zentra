@@ -21,7 +21,7 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView className="flex-1 bg-dark p-5">
       <ScrollView className="flex-1">
-        <Text className="text-white text-3xl font-oswald mb-8 text-center">Profil</Text>
+        <Text className="text-white text-3xl font-oswald mb-8 text-center">👤 Profil</Text>
 
     
 
@@ -30,7 +30,7 @@ export default function ProfileScreen() {
           className="bg-light-blue p-4 rounded-lg mb-4"
           onPress={() => router.push({ pathname: '/(stack)/profile-details' })}
         >
-          <Text className="text-dark font-oswald text-lg text-center">Profil Detayları</Text>
+          <Text className="text-dark font-oswald text-lg text-center">📝 Profil Detayları</Text>
         </TouchableOpacity>
 
         
@@ -38,19 +38,19 @@ export default function ProfileScreen() {
           className="bg-light-blue p-4 rounded-lg mb-4"
           onPress={() => router.push({ pathname: '/(stack)/notification-settings' })}
         >
-          <Text className="text-dark font-oswald text-lg text-center">Bildirim Ayarları</Text>
+          <Text className="text-dark font-oswald text-lg text-center">🔔 Bildirim Ayarları</Text>
         </TouchableOpacity>
         <TouchableOpacity
           className="bg-dark-gray p-4 rounded-lg mb-8"
           onPress={() => { console.log('Geri Bildirim Gönder tıklandı'); }}
         >
-          <Text className="text-white font-oswald text-lg">Geri Bildirim Gönder</Text>
+          <Text className="text-white font-oswald text-lg">💬 Geri Bildirim Gönder</Text>
         </TouchableOpacity>
         <TouchableOpacity
           className="bg-red-500 p-4 rounded-lg"
           onPress={handleLogout}
         >
-          <Text className="text-white font-oswald text-lg text-center">Çıkış Yap</Text>
+          <Text className="text-white font-oswald text-lg text-center">🚪 Çıkış Yap</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

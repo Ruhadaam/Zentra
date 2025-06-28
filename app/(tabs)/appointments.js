@@ -95,7 +95,7 @@ export default function AppointmentsScreen() {
     return (
         <SafeAreaView className="bg-dark flex-1">
             <ScrollView className="flex-1">
-                <Text className="text-white text-3xl font-oswald p-5">Randevular</Text>
+                <Text className="text-white text-3xl font-oswald p-5">📅 Randevular</Text>
                 <Calendar
                     onDayPress={(day) => setSelectedDate(day.dateString)}
                     theme={{
@@ -137,9 +137,9 @@ export default function AppointmentsScreen() {
                         } : {})
                     }}
                 />
-                <Text className="text-gray-500 font-oswald text-center text-base mb-2">Randevu hakkında detay için randevuya tıklayınız</Text>
+                <Text className="text-gray-500 font-oswald text-center text-base mb-2">📋 Randevu hakkında detay için randevuya tıklayınız</Text>
                 <View className="bg-dark-gray p-4 rounded-lg mx-6">
-                    <Text className="text-white font-oswald text-xl mb-4">Seçilen Günün Randevuları</Text>
+                    <Text className="text-white font-oswald text-xl mb-4">🗓️ Seçilen Günün Randevuları</Text>
                     {selectedDate ? (
                         selectedAppointments.length > 0 ? (
                             selectedAppointments.sort((a, b) => a.time.localeCompare(b.time)).map((appointment, index) => (
@@ -156,21 +156,23 @@ export default function AppointmentsScreen() {
                                             <View className="min-w-[80px] max-w-[100px]">
                                                 <View className="flex-row items-center">
                                                     <FontAwesome name="clock-o" size={20} color="#0B1215" />
-                                                    <Text className="text-dark font-oswald text-base ml-2" numberOfLines={1} ellipsizeMode="tail">{appointment.time || '--:--'}</Text>
+                                                    <Text className="text-dark font-oswald text-base ml-2" numberOfLines={1} ellipsizeMode="tail">⏰ {appointment.time || '--:--'}</Text>
                                                 </View>
                                                 {appointment.note && (
                                                     <View className="flex-row items-center mt-3 ml-2">
                                                         <FontAwesome name="sticky-note-o" size={16} color="#0B1215" />
-                                                        <Text className="text-dark font-oswald text-base ml-1" numberOfLines={1} ellipsizeMode="tail">Not var</Text>
+                                                        <Text className="text-dark font-oswald text-base ml-1" numberOfLines={1} ellipsizeMode="tail">📝 Not var</Text>
                                                     </View>
                                                 )}
                                             </View>
                                             <View className="items-center justify-center min-w-[80px] max-w-[90px]">
                                                 <Text className="text-dark font-oswald text-sm">Durum</Text>
-                                                <Text className={`text-dark font-oswald text-lg ${appointment.status === 'Beklemede' ? 'text-yellow-600' :  'text-green-600'}`} numberOfLines={1} ellipsizeMode="tail">{appointment.status || '--'}</Text>
+                                                <Text className={`text-dark font-oswald text-lg ${appointment.status === 'Beklemede' ? 'text-yellow-600' :  appointment.status === 'Tamamlandı' ? 'text-green-600' : 'text-red-600'}`} numberOfLines={1} ellipsizeMode="tail">
+                                                    {appointment.status === 'Beklemede' ? '⏳' : appointment.status === 'Tamamlandı' ? '✅' : '❌'} {appointment.status || '--'}
+                                                </Text>
                                             </View>
                                             <View className="items-end min-w-[100px] max-w-[120px]">
-                                                <Text className="text-dark font-oswald text-lg" numberOfLines={1} ellipsizeMode="tail">{appointment.customerName || 'Bilinmiyor'}</Text>
+                                                <Text className="text-dark font-oswald text-lg" numberOfLines={1} ellipsizeMode="tail">👤 {appointment.customerName || 'Bilinmiyor'}</Text>
                                                 <Text className="text-dark font-oswald text-base" numberOfLines={1} ellipsizeMode="tail">{appointment.phoneNumber}</Text>
                                             </View>
                                         </View>
@@ -179,12 +181,12 @@ export default function AppointmentsScreen() {
                             ))
                         ) : (
                             <Text className="text-gray-400 font-oswald text-center mt-3">
-                                {selectedDate} için randevu bulunamadı.
+                                😴 {selectedDate} için randevu bulunamadı.
                             </Text>
                         )
                     ) : (
                         <Text className="text-gray-400 font-oswald text-center mt-3">
-                            Bir tarih seçin.
+                            📅 Bir tarih seçin.
                         </Text>
                     )}
                 </View>
