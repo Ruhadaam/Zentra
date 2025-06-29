@@ -15,10 +15,15 @@
       "autoIncrement": true
     },
     "local": {
-      "android": {
-        "buildType": "apk"
-      }
+  "android": {
+    "buildType": "apk",
+    "gradleCommand": ":app:assembleRelease",
+    "env": {
+      "ANDROID_HOME": "/home/ruhadam/Android/Sdk"
     }
+  }
+}
+
   },
   "submit": {
     "production": {}
